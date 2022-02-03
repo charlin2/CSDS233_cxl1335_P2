@@ -157,14 +157,17 @@ public class NumLinkedList implements NumList {
             if (size() == 1) {
                 head = null;
                 tail = null;
+                size--;
             } else {
                 head = head.next();
                 head.setPrev(null);
+                size--;
             }
         // remove from back
         } else if (i == size()-1) {
             tail = tail.prev();
             tail.setNext(null);
+            size--;
         } else {
             int index = 0;
             ListNode pointer = head;
@@ -172,33 +175,84 @@ public class NumLinkedList implements NumList {
                 pointer = pointer.next();
             }
             // assigning pointers to skip over removed node
-            pointer.setNext(pointer.next());
+            pointer.setNext(pointer.next().next());
             pointer.next().setPrev(pointer);
+            size--;
         }
     }
 
     @Override
     public boolean contains(double value) {
-        // TODO Auto-generated method stub
+        ListNode pointer = head;
+        // Iterate linearly from start to find value
+        while (pointer != null) {
+            if (pointer.getValue() == value) return true;
+            pointer = pointer.next();
+        }
         return false;
     }
 
     @Override
     public double lookup(int i) throws IndexOutOfBoundsException {
-        // TODO Auto-generated method stub
-        return 0;
+        if (i < 0 || i >= size()) throw new IndexOutOfBoundsException();
+        int counter = 0;
+        ListNode pointer = head;
+        // traverse to specified index
+        while (counter++ != i) {
+            pointer = pointer.next();
+        }
+        return pointer.getValue();
     }
 
     @Override
     public boolean equals(NumList otherList) {
-        // TODO Auto-generated method stub
-        return false;
+        if (size() != otherList.size()) return false;
+        else if (size() == 0 && otherList.size() == 0) return true;
+        else {
+            int otherListCounter = 0;
+            ListNode pointer = head;
+            while (pointer != null) {
+                if (pointer.getValue() != otherList.lookup(otherListCounter++)) return false;
+                pointer = pointer.next();
+            }
+        }
+        return true;
     }
 
     @Override
     public void removeDuplicates() {
-        // TODO Auto-generated method stub
-        
+        ListNode currentNode = head;
+        int currentNodeIndex = 0;
+        while (currentNode != null) {
+            ListNode pointer = currentNode.next();
+            int counter = currentNodeIndex+1;
+            while (pointer != null) {
+                if (currentNode.getValue() == pointer.getValue()) {
+                    remove(counter--);  // decrement counter to stay in place
+                    pointer = pointer.prev();
+                }
+                pointer = pointer.next();
+                counter++;
+            }
+            currentNode = currentNode.next();
+            currentNodeIndex++;
+        }
+    }
+
+    @Override
+    public String toString() {
+        // empty list
+        if (size() == 0) return "";
+        StringBuilder result = new StringBuilder();
+        int counter = 0;
+        ListNode pointer = head;
+        while (counter++ < size() - 1) {
+            result.append(pointer.getValue());
+            result.append(' ');
+            pointer = pointer.next();
+        }
+        result.append(pointer.getValue());
+        return result.toString();
     }
     
 }
