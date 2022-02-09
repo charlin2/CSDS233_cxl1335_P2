@@ -150,6 +150,51 @@ public class NumArrayList implements NumList {
         return arrayString.toString();
     }
 
+    @Override
+    public boolean isSorted() {
+        for (int i = 0; i < size()-1; i++) {
+            if (list[i] > list[i+1]) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void reverse() {
+        for (int i = 0; i < size()/2; i++) {
+            double temp = list[i];
+            list[i] = list[size()-i-1];
+            list[size()-i-1] = temp;
+        }
+    }
+
+    @Override
+    public NumList union(NumList list1, NumList list2) {
+        NumArrayList union = new NumArrayList();
+        // both lists are sorted
+        if (list1.isSorted() && list2.isSorted()) {
+            int counter1 = 0;
+            int counter2 = 0;
+            // stop at length of shorter list
+            while (counter1 != list1.size() && counter2 != list2.size()) {
+                if (list1.lookup(counter1) < list2.lookup(counter2)) union.add(list1.lookup(counter1++));
+                else if (list1.lookup(counter1) > list2.lookup(counter2)) union.add(list2.lookup(counter2++));
+                else if (list1.lookup(counter1++) == list2.lookup(counter2)) union.add(list2.lookup(counter2++));
+            }
+            // while loops double as if conditions for determining which lists still need to be added
+            while (counter1 < list1.size()) union.add(list1.lookup(counter1++));
+            while (counter2 < list2.size()) union.add(list2.lookup(counter2++));
+        } else { // unsorted lists
+            for (int i = 0; i < list1.size(); i++) {
+                union.add(list1.lookup(i));
+            }
+            for (int i = 0; i < list2.size(); i++) {
+                union.add(list2.lookup(i));
+            }
+        }
+        union.removeDuplicates();
+        return union;
+    }
+
     public static void main(String[] args) {
         NumArrayList demoList = new NumArrayList();
         System.out.println("NumArrayList demoList = new NumArrayList()");

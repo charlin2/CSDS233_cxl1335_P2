@@ -69,4 +69,22 @@ public interface NumList {
      */
     String toString();
 
+    /**
+     * Returns true if the list is sorted in ascending order
+     * @return true if the list is sorted in ascending order
+     */
+    boolean isSorted();
+
+    /**
+     * Reverses the elements of the list
+     */
+    void reverse();
+
+    /**
+     * Returns a list representing the union of two lists without duplicates
+     * @param list1 list to be combined
+     * @param list2 list to be combined
+     * @return a combined NumList
+     */
+    NumList union(NumList list1, NumList list2);
 }

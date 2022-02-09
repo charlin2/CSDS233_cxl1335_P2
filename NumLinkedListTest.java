@@ -3,69 +3,54 @@ import org.junit.Test;
 
 public class NumLinkedListTest {
     NumLinkedList list = new NumLinkedList();
-
     @Test
     public void testAdd() {
         // Adding to empty list
         list.add(1);
-        Assert.assertEquals(1, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
+        Assert.assertEquals(1, list.lookup(0), 0.001);
         Assert.assertEquals(1, list.size());
-        // Checking pointers
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getHead().next());
-        Assert.assertEquals(null, list.getTail().prev());
-        Assert.assertEquals(null, list.getTail().next());
 
         // Additional adds
         list.add(2);
         list.add(3);
         list.add(4);
-        Assert.assertEquals(1, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(2, list.getHead().next().getValue(), 0.001);
-        Assert.assertEquals(3, list.getHead().next().next().getValue(), 0.001);
-        Assert.assertEquals(4, list.getHead().next().next().next().getValue(), 0.001);
-        Assert.assertEquals(4, list.getTail().getValue(), 0.001);
+        Assert.assertEquals(1, list.lookup(0), 0.001);
+        Assert.assertEquals(2, list.lookup(1), 0.001);
+        Assert.assertEquals(3, list.lookup(2), 0.001);
+        Assert.assertEquals(4, list.lookup(3), 0.001);
         Assert.assertEquals(4, list.size());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().next());
     }
 
     @Test
     public void testInsert() {
         // Inserting into empty list
         list.insert(0, 1);
-        Assert.assertEquals(1, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
+        Assert.assertEquals("1.0", list.toString());
         Assert.assertEquals(1, list.size());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getHead().next());
-        Assert.assertEquals(null, list.getTail().prev());
-        Assert.assertEquals(null, list.getTail().next());
 
         // Test 1 (insert with one element in the list)
         list.insert(0, 11);
-        Assert.assertEquals(11, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getHead().next().getValue(), 0.001);
+        Assert.assertEquals("11.0 1.0", list.toString());
         Assert.assertEquals(2, list.size());
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
-        Assert.assertEquals(11, list.getTail().prev().getValue(), 0.001);
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().next());
 
         // Test many (multiple inserts in multiple places in the list)
         list.insert(1, 22);
-        Assert.assertEquals(22, list.getHead().next().getValue(), 0.001);
-        Assert.assertEquals(11, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
+        Assert.assertEquals("11.0 22.0 1.0", list.toString());
         Assert.assertEquals(3, list.size());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().next());
 
         list.insert(6, 33);
-        Assert.assertEquals(33, list.getTail().getValue(), 0.001);
+        Assert.assertEquals("11.0 22.0 1.0 33.0", list.toString());
         Assert.assertEquals(4, list.size());
-        Assert.assertEquals(null, list.getTail().next());
+
+        list.insert(0, 44);
+        Assert.assertEquals("44.0 11.0 22.0 1.0 33.0", list.toString());
+        Assert.assertEquals(5, list.size());
+
+        list.insert(4, 66);
+        Assert.assertEquals("44.0 11.0 22.0 1.0 66.0 33.0", list.toString());
+
+        list.insert(2, 99);
+        Assert.assertEquals("44.0 11.0 99.0 22.0 1.0 66.0 33.0", list.toString());
     }
 
     @Test
@@ -89,8 +74,7 @@ public class NumLinkedListTest {
         // removing from empty list should not throw any exceptions
         try {
             list.remove(0);
-            Assert.assertEquals(null, list.getHead());
-            Assert.assertEquals(null, list.getTail());
+            Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.assertFalse(true);
         }
@@ -98,45 +82,36 @@ public class NumLinkedListTest {
         // removing from list of size 1
         list.add(1);
         list.remove(1);  // this call should do nothing
-        Assert.assertEquals(1, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
+        Assert.assertEquals(1, list.lookup(0), 0.001);
         Assert.assertEquals(1, list.size());
         list.remove(0);  // list should now be empty
-        Assert.assertEquals(null, list.getHead());
-        Assert.assertEquals(null, list.getTail());
+        Assert.assertEquals("", list.toString());
         Assert.assertEquals(0, list.size());
 
         // removing from lists of size > 1
         list.add(1);
         list.add(2);
         list.remove(1);
-        Assert.assertEquals(1, list.getHead().getValue(), 0.001);
-        Assert.assertEquals(1, list.getTail().getValue(), 0.001);
-        Assert.assertEquals(null, list.getHead().next());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().prev());
-        Assert.assertEquals(null, list.getTail().next());
+        Assert.assertEquals(1, list.lookup(0), 0.001);
+        Assert.assertEquals("1.0", list.toString());
         Assert.assertEquals(1, list.size());
 
-        list.add(2);
-        list.add(3);
-        list.add(4);
-        list.add(5);
+        for (int i = 2; i < 6; i++) list.add(i);
         list.remove(2);
         Assert.assertEquals("1.0 2.0 4.0 5.0", list.toString());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().next());
         Assert.assertEquals(4, list.size());
 
         list.remove(3);
         Assert.assertEquals("1.0 2.0 4.0", list.toString());
-        Assert.assertEquals(null, list.getHead().prev());
-        Assert.assertEquals(null, list.getTail().next());
         Assert.assertEquals(3, list.size());
 
         // Negative index
         list.remove(-2);
         Assert.assertEquals("1.0 2.0 4.0", list.toString());
+
+        for (int i = 5; i < 10; i++) list.add(i);
+        list.remove(6);
+        Assert.assertEquals("1.0 2.0 4.0 5.0 6.0 7.0 9.0", list.toString());
     }
 
     @Test
@@ -294,5 +269,101 @@ public class NumLinkedListTest {
         list.removeDuplicates();
         Assert.assertEquals("1.0 2.0 3.0 4.0", list.toString());
         Assert.assertEquals(4, list.size());
+    }
+
+    @Test
+    public void testIsSorted() {
+        // empty list
+        Assert.assertTrue(list.isSorted());
+
+        // size = 1
+        list.add(1);
+        Assert.assertTrue(list.isSorted());
+
+        // sorted list size > 1
+        list.add(2);
+        list.add(2);  // equal values are considered ascending
+        list.add(3);
+        list.insert(1, 1);
+        Assert.assertTrue(list.isSorted());
+
+        // unsorted list size > 1
+        list.add(2);
+        Assert.assertFalse(list.isSorted());
+
+        list = new NumLinkedList();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        Assert.assertTrue(list.isSorted());
+        list.insert(0, 10);
+        Assert.assertFalse(list.isSorted());
+    }
+
+    @Test
+    public void testReverse() {
+        // empty list (should not throw exception or alter list)
+        try {
+            list.reverse();
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
+
+        // size 1 (should not throw exception or alter list)
+        list.add(1);
+        try {
+            list.reverse();
+            Assert.assertTrue(true);
+            Assert.assertEquals(1, list.lookup(0), 0.001);
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
+
+        // size > 1
+        list.add(2);
+        list.add(3);
+        list.reverse();
+        Assert.assertEquals("3.0 2.0 1.0", list.toString()); // if toString works, then all pointers are correct
+    }
+
+    @Test
+    public void testUnion() {
+        // Test unions with both linked list and array list
+        NumLinkedList list2 = new NumLinkedList();
+        NumArrayList list3 = new NumArrayList();
+
+        // empty lists will return empty union
+        Assert.assertEquals("", list.union(list, list2).toString());
+        Assert.assertEquals("", list.union(list, list3).toString());
+        Assert.assertTrue(list.union(list, list2) instanceof NumLinkedList);
+        Assert.assertTrue(list.union(list, list3) instanceof NumLinkedList);
+
+        // lists of size one
+        list.add(1);
+        list2.add(-2);
+        list3.add(5);
+        Assert.assertEquals("-2.0 1.0", list.union(list, list2).toString());
+        Assert.assertEquals("1.0 5.0", list.union(list, list3).toString());
+
+        // lists of size > 1, sorted/unsorted, with/without duplicates
+        list.add(2);
+        list.add(3);
+        list.add(4);
+
+        list2.add(1);
+        list2.add(-6);
+        list2.add(2);
+
+        list3.add(6);
+        list3.add(10);
+        list3.add(12);
+
+        // unsorted, result will be unsorted
+        Assert.assertEquals("1.0 2.0 3.0 4.0 -2.0 -6.0", list.union(list, list2).toString());
+
+        // sorted, result will be sorted
+        Assert.assertEquals("1.0 2.0 3.0 4.0 5.0 6.0 10.0 12.0", list.union(list, list3).toString());
     }
 }

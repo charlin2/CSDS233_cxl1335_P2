@@ -13,7 +13,7 @@ public class NumLinkedList implements NumList {
     private int size = 0;
 
     /** Represents individual nodes within the linked list */
-    public class ListNode {
+    private class ListNode {
         /** the float stored in the node */
         private double value = 0;
 
@@ -27,26 +27,12 @@ public class NumLinkedList implements NumList {
             this.value = value;
         }
 
-        public ListNode(double value, ListNode prev, ListNode next) {
-            this.value = value;
-            this.prev = prev;
-            this.next = next;
-        }
-
         /**
          * Returns the stored float
          * @return the stored float
          */
         public double getValue() {
             return value;
-        }
-
-        /**
-         * Sets the float to a new value
-         * @param value the new float to set
-         */
-        public void setValue(double value) {
-            this.value = value;
         }
 
         /**
@@ -83,16 +69,6 @@ public class NumLinkedList implements NumList {
 
     }
 
-    /** Method for testing */
-    public ListNode getHead() {
-        return head;
-    }
-
-    /** Method for testing */
-    public ListNode getTail() {
-        return tail;
-    }
-
     @Override
     public int size() {
         return size;
@@ -124,35 +100,45 @@ public class NumLinkedList implements NumList {
         // if invalid index, just append
         if (i >= size() || i < 0) {
             add(value);
-        } else if (i == 0) { // empty list
+        } else if (i == 0) { // insert at head
             ListNode node = new ListNode(value);
-            getHead().setPrev(node);
-            node.setNext(getHead());
+            head.setPrev(node);
+            node.setNext(head);
             head = node;
             size++;
-        } else {
-            int index = 0;
+        } else if (i < size()/2) { // insert at front half of list
             ListNode node = new ListNode(value);
+            int index = 0;
             ListNode pointer = head;
             // traverse to specified index
-            while (++index < i) {
+            while (++index < i) 
                 pointer = pointer.next();
-            }
             // assigning pointers to insert new node
             node.setNext(pointer.next());
             pointer.next().setPrev(node);
             pointer.setNext(node);
             node.setPrev(pointer);
+            size++;    
+        } else { // insert at back half of list
+            ListNode node = new ListNode(value);
+            int index = size()-1;
+            ListNode pointer = tail;
+            // traverse to specified index
+            while (--index > i) 
+                pointer = pointer.prev();
+            // assigning pointers to insert
+            node.setNext(pointer);
+            node.setPrev(pointer.prev());
+            pointer.prev().setNext(node);
+            pointer.setPrev(node);
             size++;
         }
     }
 
     @Override
     public void remove(int i) {
-        // do nothing
-        if (i < 0 || i >= size());
-        // remove from front
-        else if (i == 0) {
+        if (i < 0 || i >= size()); // do nothing
+        else if (i == 0) { // remove from head
             // if list is only 1 element large
             if (size() == 1) {
                 head = null;
@@ -163,20 +149,28 @@ public class NumLinkedList implements NumList {
                 head.setPrev(null);
                 size--;
             }
-        // remove from back
-        } else if (i == size()-1) {
+        } else if (i == size()-1) { // remove from tail
             tail = tail.prev();
             tail.setNext(null);
             size--;
-        } else {
+        } else if (i < size()/2) {
             int index = 0;
             ListNode pointer = head;
-            while (++index < i) {
+            // iterate to node before i
+            while (++index < i) 
                 pointer = pointer.next();
-            }
             // assigning pointers to skip over removed node
             pointer.setNext(pointer.next().next());
             pointer.next().setPrev(pointer);
+            size--;
+        } else {
+            int index = size()-1;
+            ListNode pointer = tail;
+            // iterate to node after i
+            while (--index > i) 
+                pointer = pointer.prev();
+            pointer.setPrev(pointer.prev().prev());
+            pointer.prev().setNext(pointer);
             size--;
         }
     }
@@ -195,13 +189,22 @@ public class NumLinkedList implements NumList {
     @Override
     public double lookup(int i) throws IndexOutOfBoundsException {
         if (i < 0 || i >= size()) throw new IndexOutOfBoundsException();
-        int counter = 0;
-        ListNode pointer = head;
-        // traverse to specified index
-        while (counter++ != i) {
-            pointer = pointer.next();
+        ListNode pointer;
+        if (i < size()/2) {
+            int counter = 0;
+            pointer = head;
+            // traverse to specified index
+            while (counter++ != i) 
+                pointer = pointer.next();
+            return pointer.getValue();
         }
-        return pointer.getValue();
+        else {
+            int counter = size()-1;
+            pointer = tail;
+            while (counter-- != i) 
+                pointer = pointer.prev();
+            return pointer.getValue();
+        }
     }
 
     @Override
@@ -255,4 +258,70 @@ public class NumLinkedList implements NumList {
         return result.toString();
     }
     
+    @Override
+    public boolean isSorted() {
+        // empty list
+        if (size == 0 || size == 1) return true;
+        ListNode pointer = head;
+        while (pointer.next() != null) {
+            if (pointer.getValue() > pointer.next().getValue()) return false;
+            pointer = pointer.next();
+        }
+        return true;
+    }
+
+    @Override
+    public void reverse() {
+        if (!(size() == 0 || size() == 1)) { // do nothing if empty or size 1
+            ListNode pointer = head;
+            ListNode temp;
+            while (pointer != null) {
+                temp = pointer.next();
+                pointer.setNext(pointer.prev());
+                pointer.setPrev(temp);
+                pointer = pointer.prev();
+            }
+            temp = head;
+            head = tail;
+            tail = temp;
+        }
+    }
+
+    @Override
+    public NumList union(NumList list1, NumList list2) {
+        NumLinkedList union = new NumLinkedList();
+        // both lists are sorted
+        if (list1.isSorted() && list2.isSorted()) {
+            int counter1 = 0;
+            int counter2 = 0;
+            // stop at length of shorter list
+            while (counter1 != list1.size() && counter2 != list2.size()) {
+                if (list1.lookup(counter1) < list2.lookup(counter2)) 
+                    union.add(list1.lookup(counter1++));
+                else if (list1.lookup(counter1) > list2.lookup(counter2)) 
+                    union.add(list2.lookup(counter2++));
+                else if (list1.lookup(counter1++) == list2.lookup(counter2)) 
+                    union.add(list2.lookup(counter2++));
+            }
+            // while loops double as if conditions for determining which lists still need to be added
+            while (counter1 < list1.size()) 
+                union.add(list1.lookup(counter1++));
+            while (counter2 < list2.size()) 
+                union.add(list2.lookup(counter2++));
+        } else { // unsorted lists
+            for (int i = 0; i < list1.size(); i++) {
+                union.add(list1.lookup(i));
+            }
+            for (int i = 0; i < list2.size(); i++) {
+                union.add(list2.lookup(i));
+            }
+            union.removeDuplicates();
+        }
+        return union;
+    }
+
+    public static void main(String[] args) {
+        NumLinkedList list = new NumLinkedList();
+        
+    }
 }
