@@ -9,6 +9,12 @@ public class NumArrayList implements NumList {
     /** the number of elements in the array */
     private int size = 0;
 
+    /** true if list is sorted */
+    private boolean isSorted = true;
+
+    /** true if remove has been called and isSorted has not been called */
+    private boolean removeCalled = false;
+
     /**
      * Creates a new empty NumArrayList
      */
@@ -36,6 +42,7 @@ public class NumArrayList implements NumList {
 
     @Override
     public void add(double value) {
+        if (size() > 0 && value < list[size()-1]) isSorted = false;
         try {
             list[size] = value;
             size++;
@@ -66,6 +73,10 @@ public class NumArrayList implements NumList {
                 current = next;
                 next = list[index+1];
             }
+            // check for isSorted
+            if (i == 0 && list[i] > list[i+1]) isSorted = false;
+            else if (i == size()-1 && list[i] < list[i-1]) isSorted = false;
+            else if (list[i] > list[i+1] || list[i] < list[i-1]) isSorted = false;
         }
         // array needs to be resized
         else if (i < size() && size() == capacity()) {
@@ -81,6 +92,10 @@ public class NumArrayList implements NumList {
             }
             size++;
             list = resizedList;
+            // check for isSorted
+            if (i == 0 && list[i] > list[i+1]) isSorted = false;
+            else if (i == size()-1 && list[i] < list[i-1]) isSorted = false;
+            else if (list[i] > list[i+1] || list[i] < list[i-1]) isSorted = false;
         }
     }
 
@@ -89,6 +104,7 @@ public class NumArrayList implements NumList {
         if (i >= size() || i < 0) {
             // do nothing
         } else {
+            removeCalled = true;
             for (int index = i; index < size()-1; index++) {
                 list[index] = list[index+1];
             }
@@ -152,10 +168,14 @@ public class NumArrayList implements NumList {
 
     @Override
     public boolean isSorted() {
-        for (int i = 0; i < size()-1; i++) {
-            if (list[i] > list[i+1]) return false;
+        if (removeCalled) {
+            for (int i = 0; i < size()-1; i++) {
+                if (list[i] > list[i+1]) return isSorted;
+            }
+            isSorted = true;
+            removeCalled = false;
         }
-        return true;
+        return isSorted;
     }
 
     @Override
@@ -251,5 +271,10 @@ public class NumArrayList implements NumList {
         compareList.add(40);
         compareList.add(50);
         System.out.println("demoList.equals(compareList)\n" + demoList.equals(compareList));
+        System.out.println("demoList.isSorted()\n" + demoList.isSorted());
+        demoList.reverse();
+        System.out.println("demoList.reverse()\nCurrent list: " + demoList.toString());
+        compareList.add(40);
+        System.out.println("compareList.add(40)\ndemoList.union(demoList, compareList)\n" + demoList.union(demoList, compareList).toString());
     }
 }

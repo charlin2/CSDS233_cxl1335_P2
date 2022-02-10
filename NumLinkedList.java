@@ -12,6 +12,12 @@ public class NumLinkedList implements NumList {
     /** the number of elements in the list */
     private int size = 0;
 
+    /** true if list is sorted */
+    private boolean isSorted = true; // default value should be true for empty list
+
+    /** true if remove has been called and isSorted has not been called */
+    private boolean removeCalled = false;
+
     /** Represents individual nodes within the linked list */
     private class ListNode {
         /** the float stored in the node */
@@ -88,6 +94,7 @@ public class NumLinkedList implements NumList {
             tail = node;
             size++;
         } else {
+            if (value < tail.getValue()) isSorted = false;
             tail.setNext(node);
             node.setPrev(tail);
             tail = node;
@@ -102,6 +109,7 @@ public class NumLinkedList implements NumList {
             add(value);
         } else if (i == 0) { // insert at head
             ListNode node = new ListNode(value);
+            if (value > head.getValue()) isSorted = false;
             head.setPrev(node);
             node.setNext(head);
             head = node;
@@ -113,6 +121,7 @@ public class NumLinkedList implements NumList {
             // traverse to specified index
             while (++index < i) 
                 pointer = pointer.next();
+            if (value > pointer.next().getValue() || value < pointer.getValue()) isSorted = false;
             // assigning pointers to insert new node
             node.setNext(pointer.next());
             pointer.next().setPrev(node);
@@ -126,6 +135,7 @@ public class NumLinkedList implements NumList {
             // traverse to specified index
             while (--index > i) 
                 pointer = pointer.prev();
+            if (value > pointer.getValue() || value < pointer.prev().getValue()) isSorted = false;
             // assigning pointers to insert
             node.setNext(pointer);
             node.setPrev(pointer.prev());
@@ -145,15 +155,18 @@ public class NumLinkedList implements NumList {
                 tail = null;
                 size--;
             } else {
+                removeCalled = true;
                 head = head.next();
                 head.setPrev(null);
                 size--;
             }
         } else if (i == size()-1) { // remove from tail
+            removeCalled = true;
             tail = tail.prev();
             tail.setNext(null);
             size--;
         } else if (i < size()/2) {
+            removeCalled = true;
             int index = 0;
             ListNode pointer = head;
             // iterate to node before i
@@ -164,6 +177,7 @@ public class NumLinkedList implements NumList {
             pointer.next().setPrev(pointer);
             size--;
         } else {
+            removeCalled = true;
             int index = size()-1;
             ListNode pointer = tail;
             // iterate to node after i
@@ -249,7 +263,7 @@ public class NumLinkedList implements NumList {
         StringBuilder result = new StringBuilder();
         int counter = 0;
         ListNode pointer = head;
-        while (counter++ < size() - 1) {
+        while (counter++ < size()-1) {
             result.append(pointer.getValue());
             result.append(' ');
             pointer = pointer.next();
@@ -260,14 +274,16 @@ public class NumLinkedList implements NumList {
     
     @Override
     public boolean isSorted() {
-        // empty list
-        if (size == 0 || size == 1) return true;
-        ListNode pointer = head;
-        while (pointer.next() != null) {
-            if (pointer.getValue() > pointer.next().getValue()) return false;
-            pointer = pointer.next();
-        }
-        return true;
+        if (removeCalled) {
+            ListNode pointer = head;
+            while (pointer.next() != null) {
+                if (pointer.getValue() > pointer.next().getValue()) return isSorted;
+                pointer = pointer.next();
+            }
+            isSorted = true;
+            removeCalled = false;
+        }   
+        return isSorted;
     }
 
     @Override
@@ -321,7 +337,65 @@ public class NumLinkedList implements NumList {
     }
 
     public static void main(String[] args) {
-        NumLinkedList list = new NumLinkedList();
-        
+        NumLinkedList demoList = new NumLinkedList();
+        System.out.println("NumLinkedList demoList = new NumLinkedList()");
+        System.out.println("Empty list will return an empty list.\n" + "Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\ndemoList.add(10)");
+        demoList.add(10);
+        System.out.println("Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\ndemoList.add(20)");
+        System.out.println("demoList.add(30)");
+        System.out.println("demoList.add(50)");
+        demoList.add(20);
+        demoList.add(30);
+        demoList.add(50);
+        System.out.println("Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\ndemoList.insert(3, 40)");
+        demoList.insert(3, 40);
+        System.out.println("Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\ndemoList.remove(1)");
+        demoList.remove(1);
+        System.out.println("Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\ndemoList.contains(20) \n" + demoList.contains(20));
+        System.out.println("\ndemoList.lookup(1) \n" + demoList.lookup(1));
+        System.out.println("\ndemoList.add(10)");
+        System.out.println("demoList.add(10)");
+        System.out.println("demoList.add(40)");
+        System.out.println("demoList.add(30)");
+        demoList.add(10);
+        demoList.add(10);
+        demoList.add(40);
+        demoList.add(30);
+        System.out.println("demoList.removeDuplicates()");
+        demoList.removeDuplicates();
+        System.out.println("Current list: " + demoList.toString());
+        System.out.println("Current list size: " + demoList.size());
+        System.out.println("Current list capacity: " + demoList.capacity());
+        System.out.println("\nNumArrayList compareList = new NumArrayList(30)");
+        NumArrayList compareList = new NumArrayList(30);
+        System.out.println("compareList.add(10)");
+        System.out.println("compareList.add(30)");
+        System.out.println("compareList.add(40)");
+        System.out.println("compareList.add(50)");
+        compareList.add(10);
+        compareList.add(30);
+        compareList.add(40);
+        compareList.add(50);
+        System.out.println("demoList.equals(compareList)\n" + demoList.equals(compareList));
+        System.out.println("demoList.isSorted()\n" + demoList.isSorted());
+        demoList.reverse();
+        System.out.println("demoList.reverse()\nCurrent list: " + demoList.toString());
+        compareList.add(40);
+        System.out.println("compareList.add(40)\ndemoList.union(demoList, compareList)\n" + demoList.union(demoList, compareList).toString());
     }
 }

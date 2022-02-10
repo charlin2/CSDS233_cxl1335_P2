@@ -259,14 +259,31 @@ public class NumArrayListTest {
         list.add(1);
         Assert.assertTrue(list.isSorted());
 
-        // sorted size > 1
+        // sorted list size > 1
         list.add(2);
-        list.add(2);
+        list.add(2);  // equal values are considered ascending
         list.add(3);
+        list.insert(1, 1);
         Assert.assertTrue(list.isSorted());
 
-        // unsorted size > 1
+        // unsorted list size > 1
         list.add(2);
+        Assert.assertFalse(list.isSorted());
+
+        list = new NumArrayList();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        Assert.assertTrue(list.isSorted());
+        list.insert(0, 10);
+        Assert.assertFalse(list.isSorted());
+        list.remove(0); // list can be sorted after remove is called
+        Assert.assertTrue(list.isSorted());
+        list.remove(3);
+        Assert.assertTrue(list.isSorted());
+        list.insert(0, 3);
+        list.remove(2); // list can also not be sorted after remove is called
         Assert.assertFalse(list.isSorted());
     }
 

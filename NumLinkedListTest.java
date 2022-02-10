@@ -299,6 +299,13 @@ public class NumLinkedListTest {
         Assert.assertTrue(list.isSorted());
         list.insert(0, 10);
         Assert.assertFalse(list.isSorted());
+        list.remove(0); // list can be sorted after remove is called
+        Assert.assertTrue(list.isSorted());
+        list.remove(3);
+        Assert.assertTrue(list.isSorted());
+        list.insert(0, 3);
+        list.remove(2); // list can also not be sorted after remove is called
+        Assert.assertFalse(list.isSorted());
     }
 
     @Test
