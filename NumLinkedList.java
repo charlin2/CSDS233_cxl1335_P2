@@ -331,8 +331,8 @@ public class NumLinkedList implements NumList {
             for (int i = 0; i < list2.size(); i++) {
                 union.add(list2.lookup(i));
             }
-            union.removeDuplicates();
         }
+        union.removeDuplicates();
         return union;
     }
 

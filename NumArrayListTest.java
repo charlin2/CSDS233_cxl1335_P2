@@ -310,8 +310,10 @@ public class NumArrayListTest {
         // size > 1
         list.add(2);
         list.add(3);
+        list.add(4);
+        list.add(5);
         list.reverse();
-        Assert.assertEquals("3.0 2.0 1.0", list.toString());
+        Assert.assertEquals("5.0 4.0 3.0 2.0 1.0", list.toString());
     }
 
     @Test
@@ -348,8 +350,10 @@ public class NumArrayListTest {
 
         // unsorted, result will be unsorted
         Assert.assertEquals("1.0 2.0 3.0 4.0 -2.0 -6.0", list.union(list, list2).toString());
+        Assert.assertFalse(list.union(list, list2).isSorted());
 
         // sorted, result will be sorted
         Assert.assertEquals("1.0 2.0 3.0 4.0 5.0 6.0 10.0 12.0", list.union(list, list3).toString());
+        Assert.assertTrue(list.union(list, list3).isSorted());
     }
 }
