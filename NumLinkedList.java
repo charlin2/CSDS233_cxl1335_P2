@@ -320,10 +320,16 @@ public class NumLinkedList implements NumList {
                     union.add(list2.lookup(counter2++));
             }
             // while loops double as if conditions for determining which lists still need to be added
-            while (counter1 < list1.size()) 
-                union.add(list1.lookup(counter1++));
-            while (counter2 < list2.size()) 
-                union.add(list2.lookup(counter2++));
+            while (counter1 < list1.size()) {
+                if (list1.lookup(counter1) != union.lookup(union.size()-1))
+                    union.add(list1.lookup(counter1));
+                counter1++;
+            }
+            while (counter2 < list2.size()) {
+                if (list2.lookup(counter2) != union.lookup(union.size()-1))
+                    union.add(list2.lookup(counter2));
+                counter2++;
+            }
         } else { // unsorted lists
             for (int i = 0; i < list1.size(); i++) {
                 union.add(list1.lookup(i));
@@ -331,8 +337,8 @@ public class NumLinkedList implements NumList {
             for (int i = 0; i < list2.size(); i++) {
                 union.add(list2.lookup(i));
             }
+            union.removeDuplicates();
         }
-        union.removeDuplicates();
         return union;
     }
 

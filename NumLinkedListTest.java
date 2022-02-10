@@ -366,6 +366,7 @@ public class NumLinkedListTest {
         list2.add(2);
 
         list3.add(6);
+        list3.add(6);
         list3.add(10);
         list3.add(12);
 
